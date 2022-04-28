@@ -1,0 +1,59 @@
+digraph G {
+    subgraph clustercloud {
+        label = "Entrées";
+
+        tableur [style=filled]
+        drive_SVG [style=filled]
+        extract_osm [style=filled]
+    }
+
+    subgraph clusterstyle {
+        label = "Styles";
+
+        tableur -> unmatched;
+        drive_SVG -> unmatched;
+        unmatched -> lister_erreur_icones
+
+        drive_SVG -> flat_icon;
+        couleurs -> flat_icon;
+
+        flat_icon -> style_git;
+        style_json -> style_git;
+
+        couleurs [style=filled]
+        unmatched [shape=box]
+        flat_icon [shape=box]
+        lister_erreur_icones [style=filled,fillcolor=cyan]
+        couleurs [style=filled]
+        style_json [style=filled]
+    }
+
+    subgraph clusterdata {
+        label = "Données";
+
+        tableur -> a;
+        a -> class_teritorio_sql;
+        a -> mapping_teritorio_yaml;
+        class_teritorio_sql -> OpenMapTiles;
+        mapping_teritorio_yaml -> OpenMapTiles;
+        extract_osm -> OpenMapTiles;
+
+        OpenMapTiles -> mbtiles;
+
+        a [shape=box]
+        OpenMapTiles [shape=box]
+    }
+
+    subgraph clusterserveur {
+        label = "Serveur";
+
+        style_git -> tileserver;
+        mbtiles -> tileserver;
+        tileserver -> web;
+
+        tileserver [shape=box
+]
+    }
+
+    web [style=filled,fillcolor=cyan]
+}
