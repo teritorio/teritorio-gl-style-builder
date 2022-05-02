@@ -6,20 +6,19 @@ STYLE_DIR=$1
 
 source $STYLE_DIR/.env
 
-curl "$DOC/gviz/tq?tqx=out:csv&sheet=POI_liste_teritorio" > data-vectoriel-$THEME.csv
-curl https://drive.teritorio.fr/index.php/s/CXyoE3ZNfMBnbMp/download > icones_pictos_vectoriel.zip
+curl https://vecto-dev.teritorio.xyz/data/teritorio-${THEME}-ontology-dev.json > teritorio-${THEME}-ontology.json
+curl https://drive.teritorio.fr/index.php/s/FWntdw9fF3qnLW7/download > icones_pictos_vectoriel_flat.zip
 
-rm -fr 'icones:pictos:vectoriel'
-unzip icones_pictos_vectoriel.zip
-rm -fr "icones:pictos:vectoriel/reserve"
-rm -fr "icones:pictos:vectoriel/extra"
+rm -fr 'icones:pictos:vectoriel_flat'
+unzip icones_pictos_vectoriel_flat.zip
+rm -fr "icones:pictos:vectoriel_flat/extra"
 
-source $STYLE_DIR/colors.sh
-bash flat_ico.sh
+rm -fr icons_tree
+bash -c "`ruby hierarchy.rb teritorio-${THEME}-ontology.json icones\:pictos\:vectoriel_flat/icons icons_tree`"
+
+bash flat_ico.sh icons_tree $STYLE_DIR/colors.sh
 
 rm -f $STYLE_DIR/icons/*•*
 rm -f $STYLE_DIR/icons/*◯*
 rm -f $STYLE_DIR/icons/*⬤*
 cp /tmp/ico/* $STYLE_DIR/icons/
-
-ruby unmatched.rb $STYLE_DIR $THEME < data-vectoriel-$THEME.csv
