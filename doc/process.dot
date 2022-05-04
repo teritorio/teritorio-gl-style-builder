@@ -1,59 +1,116 @@
 digraph G {
-    subgraph clustercloud {
-        label = "Entrées";
+    subgraph cluster_sources {
+        label = "Sources";
 
         tableur [style=filled]
         drive_SVG [style=filled]
-        extract_osm [style=filled]
+        osm [style=filled]
+        sit [style=filled]
     }
 
-    subgraph clusterstyle {
-        label = "Styles";
-
-        tableur -> unmatched;
-        drive_SVG -> unmatched;
-        unmatched -> lister_erreur_icones
+    subgraph cluster_style {
+        label = "Styles Builder";
 
         drive_SVG -> flat_icon;
+
+        tableur -> couleurs [label=manuel];
         couleurs -> flat_icon;
 
-        flat_icon -> style_git;
-        style_json -> style_git;
+        flat_icon -> sprites_X;
+        flat_icon -> missing_icons;
+        style_X_json;
 
         couleurs [style=filled]
-        unmatched [shape=box]
         flat_icon [shape=box]
-        lister_erreur_icones [style=filled,fillcolor=cyan]
+        missing_icons [style=filled,fillcolor=cyan]
         couleurs [style=filled]
-        style_json [style=filled]
+        style_X_json [style=filled]
     }
 
-    subgraph clusterdata {
-        label = "Données";
+    subgraph cluster_data {
+        label = "OMT Builder";
 
-        tableur -> a;
-        a -> class_teritorio_sql;
-        a -> mapping_teritorio_yaml;
-        class_teritorio_sql -> OpenMapTiles;
-        mapping_teritorio_yaml -> OpenMapTiles;
-        extract_osm -> OpenMapTiles;
+        tableur -> ontology_build;
+        ontology_build -> class_sql;
+        ontology_build -> poi_X_yaml;
+        class_sql -> OpenMapTiles;
+        poi_X_yaml -> OpenMapTiles;
+        osm -> OpenMapTiles;
 
-        OpenMapTiles -> mbtiles;
-
-        a [shape=box]
+        ontology_build [shape=box]
         OpenMapTiles [shape=box]
     }
 
-    subgraph clusterserveur {
-        label = "Serveur";
+    subgraph cluster_tile_serveur {
+        label = "Tile Serveur";
 
-        style_git -> tileserver;
-        mbtiles -> tileserver;
-        tileserver -> web;
+        style_X_json -> tileserver;
+        sprites_X -> tileserver;
+        OpenMapTiles -> tileserver [label=MBTiles];
 
-        tileserver [shape=box
-]
+        tileserver [shape=box]
     }
 
-    web [style=filled,fillcolor=cyan]
+    subgraph cluster_synchro_osm {
+        label = "Synchro OSM";
+
+        osm -> partial_osm;
+    }
+
+    subgraph cluster_wp_elasa {
+        label = "WP/Elasa";
+
+        sit -> postgres;
+        partial_osm -> postgres;
+        postgres -> API;
+
+        API -> API_cache;
+    }
+
+
+    subgraph cluster_merge_proxy {
+        label = "Merge proxy";
+
+        tileserver -> merge_proxy [label=styles];
+        tileserver -> merge_proxy [label=tiles];
+        API_cache -> merge_proxy [label="poi/MBTiles"];
+        merge_proxy -> merge_proxy_cache;
+    }
+
+    subgraph cluster_viso_server {
+        label = "Vido Serveur";
+
+        API_cache -> vido [label=settings];
+        API_cache -> vido [label=menu];
+
+        vido -> vido_cache;
+    }
+
+    subgraph cluster_elasa_search {
+        label = "Elasa Search";
+
+        API_cache -> search [label=menu];
+        API_cache -> search [label=poi];
+    }
+
+    subgraph cluster_elasa_print {
+        label = "Elasa Search";
+
+        API_cache -> print [label=poi];
+    }
+
+    subgraph cluster_web {
+        label = "Web";
+
+        merge_proxy_cache -> web [label=styles];
+        merge_proxy_cache -> web [label=tiles];
+        tileserver -> web [label=sprites];
+
+        vido_cache -> web;
+        API_cache -> web [label=poi];
+        search -> web;
+        print -> web [label=pdf];
+
+        web [style=filled,fillcolor=cyan]
+    }
 }
