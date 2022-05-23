@@ -16,7 +16,7 @@ rm -fr "icones:pictos:vectoriel_flat/extra"
 rm -fr icons_tree
 bash -c "`ruby hierarchy.rb teritorio-${THEME}-ontology.json icones\:pictos\:vectoriel_flat/icons icons_tree`"
 
-bash flat_ico.sh icons_tree $STYLE_DIR/colors.sh
+ruby flat_ico.rb teritorio-${THEME}-ontology.json icons_tree
 
 rm -f $STYLE_DIR/icons/*•*
 rm -f $STYLE_DIR/icons/*◯*
