@@ -3,9 +3,27 @@ digraph G {
         label = "Sources";
 
         tableur [style=filled]
+        couleurs [style=filled]
         drive_SVG [style=filled]
         osm [style=filled]
         sit [style=filled]
+    }
+
+    subgraph cluster_data {
+        label = "OMT Builder";
+
+        tableur -> ontology_build;
+        couleurs -> ontology_build;
+        ontology_build -> class_sql;
+        ontology_build -> poi_X_yaml;
+        ontology_build -> ontology_X_json;
+        ontology_X_json [style=filled,fillcolor=cyan];
+        class_sql -> OpenMapTiles;
+        poi_X_yaml -> OpenMapTiles;
+        osm -> OpenMapTiles;
+
+        ontology_build [shape=box]
+        OpenMapTiles [shape=box]
     }
 
     subgraph cluster_style {
@@ -13,32 +31,16 @@ digraph G {
 
         drive_SVG -> flat_icon;
 
-        tableur -> couleurs [label=manuel];
-        couleurs -> flat_icon;
+        ontology_X_json -> flat_icon [label=manuel];
 
         flat_icon -> sprites_X;
         flat_icon -> missing_icons;
-        style_X_json;
+        couleurs -> style_X_json [label=manuel];
 
-        couleurs [style=filled]
         flat_icon [shape=box]
         missing_icons [style=filled,fillcolor=cyan]
         couleurs [style=filled]
         style_X_json [style=filled]
-    }
-
-    subgraph cluster_data {
-        label = "OMT Builder";
-
-        tableur -> ontology_build;
-        ontology_build -> class_sql;
-        ontology_build -> poi_X_yaml;
-        class_sql -> OpenMapTiles;
-        poi_X_yaml -> OpenMapTiles;
-        osm -> OpenMapTiles;
-
-        ontology_build [shape=box]
-        OpenMapTiles [shape=box]
     }
 
     subgraph cluster_tile_serveur {
@@ -94,7 +96,7 @@ digraph G {
     }
 
     subgraph cluster_elasa_print {
-        label = "Elasa Search";
+        label = "Elasa Print";
 
         API_cache -> print [label=poi];
     }
