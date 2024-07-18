@@ -7,7 +7,7 @@ STYLE_DIR=$1
 source $STYLE_DIR/.env
 
 curl https://raw.githubusercontent.com/teritorio/ontology-builder/gh-pages/teritorio-${THEME}-ontology-1.0.json > teritorio-${THEME}-ontology.json
-curl https://drive.teritorio.fr/index.php/s/FWntdw9fF3qnLW7/download > icones_pictos_vectoriel_flat.zip
+curl https://drive.teritorio.fr/index.php/s/okdGPLcsmra7fgQ/download > icones_pictos_vectoriel_flat.zip
 
 rm -fr 'icones:pictos:vectoriel_flat'
 unzip icones_pictos_vectoriel_flat.zip
