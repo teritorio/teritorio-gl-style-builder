@@ -7,22 +7,25 @@ digraph G {
         drive_SVG [style=filled]
         osm [style=filled]
         sit [style=filled]
+        opendata [style=filled]
+    }
+
+    subgraph cluster_ontology {
+        label = "Ontology Builder";
+
+        tableur -> ontology;
+        couleurs -> ontology;
     }
 
     subgraph cluster_data {
         label = "OMT Builder";
 
-        tableur -> ontology_build;
-        couleurs -> ontology_build;
-        ontology_build -> class_sql;
-        ontology_build -> poi_X_yaml;
-        ontology_build -> ontology_X_json;
-        ontology_X_json [style=filled,fillcolor=cyan];
+        ontology -> class_sql;
+        ontology -> poi_X_yaml;
         class_sql -> OpenMapTiles;
         poi_X_yaml -> OpenMapTiles;
         osm -> OpenMapTiles;
 
-        ontology_build [shape=box]
         OpenMapTiles [shape=box]
     }
 
@@ -31,16 +34,14 @@ digraph G {
 
         drive_SVG -> flat_icon;
 
-        ontology_X_json -> flat_icon [label=manuel];
+        ontology -> flat_icon [label=manuel];
 
         flat_icon -> sprites_X;
         flat_icon -> missing_icons;
-        couleurs -> style_X_json [label=manuel];
 
         flat_icon [shape=box]
         missing_icons [style=filled,fillcolor=cyan]
         couleurs [style=filled]
-        style_X_json [style=filled]
     }
 
     subgraph cluster_tile_serveur {
@@ -53,37 +54,44 @@ digraph G {
         tileserver [shape=box]
     }
 
-    subgraph cluster_synchro_osm {
-        label = "Synchro OSM";
+    subgraph cluster_clearance {
+        label = "Clearance";
 
-        osm -> partial_osm;
+        osm -> clearance [label="Extract/Diff"];
+    }
+
+    subgraph cluster_datasources {
+        label = "Datasources";
+
+        opendata -> datasources;
+        sit -> datasources;
+        clearance -> datasources[label=Overpass];
+        ontology -> datasources;
+        datasources -> clearance [label=Configuration];
     }
 
     subgraph cluster_wp_elasa {
         label = "WP/Elasa";
 
-        sit -> postgres;
-        partial_osm -> postgres;
+        datasources -> postgres;
         postgres -> API;
-
-        API -> API_cache;
     }
 
 
-    subgraph cluster_merge_proxy {
-        label = "Merge proxy";
+    subgraph cluster_merge_v_mux {
+        label = "Merge v_mux";
 
-        tileserver -> merge_proxy [label=styles];
-        tileserver -> merge_proxy [label=tiles];
-        API_cache -> merge_proxy [label="poi/MBTiles"];
-        merge_proxy -> merge_proxy_cache;
+        tileserver -> merge_v_mux [label=styles];
+        tileserver -> merge_v_mux [label=tiles];
+        API -> merge_v_mux [label="poi/MBTiles"];
+        merge_v_mux -> merge_v_mux_cache;
     }
 
     subgraph cluster_viso_server {
         label = "Vido Serveur";
 
-        API_cache -> vido [label=settings];
-        API_cache -> vido [label=menu];
+        API -> vido [label=settings];
+        API -> vido [label=menu];
 
         vido -> vido_cache;
     }
@@ -91,25 +99,25 @@ digraph G {
     subgraph cluster_elasa_search {
         label = "Elasa Search";
 
-        API_cache -> search [label=menu];
-        API_cache -> search [label=poi];
+        API -> search [label=menu];
+        API -> search [label=poi];
     }
 
     subgraph cluster_elasa_print {
         label = "Elasa Print";
 
-        API_cache -> print [label=poi];
+        API -> print [label=poi];
     }
 
     subgraph cluster_web {
         label = "Web";
 
-        merge_proxy_cache -> web [label=styles];
-        merge_proxy_cache -> web [label=tiles];
+        merge_v_mux_cache -> web [label=styles];
+        merge_v_mux_cache -> web [label=tiles];
         tileserver -> web [label=sprites];
 
         vido_cache -> web;
-        API_cache -> web [label=poi];
+        API -> web [label=poi];
         search -> web;
         print -> web [label=pdf];
 
